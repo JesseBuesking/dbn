@@ -1,0 +1,22 @@
+################################################################################
+# Set the default behaviour, in case users don't have core.autocrlf set.
+# See: https://help.github.com/articles/dealing-with-line-endings#example
+################################################################################
+* text=auto
+
+################################################################################
+# Line-feed only files.
+################################################################################
+*.sh eol=lf
+*.py eol=lf
+
+################################################################################
+# Make sure images are always binary.
+################################################################################
+*.bmp binary
+*.gif binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.tif binary
+*.tiff binary
