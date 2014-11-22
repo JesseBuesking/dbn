@@ -5,7 +5,7 @@ from dbn.rbm import RBM
 
 
 # noinspection PyDocstring
-def predict_user(values, verbose=False):
+def predict_user(titles, values, verbose=False):
     user = np.array([values])
     print('')
     print('users preferred movies:')
@@ -50,7 +50,7 @@ def predict_user(values, verbose=False):
 if __name__ == '__main__':
     r = RBM(
         ni=6,
-        num_hidden=2,
+        nh=2,
         lr=0.1
     )
     training_data = [
@@ -71,8 +71,13 @@ if __name__ == '__main__':
         'Titanic',
         'Glitter'
     ]
+    r = RBM(
+        ni=6,
+        nh=2,
+        lr=0.1
+    )
 
-    r.train(training_data, iterations=5000)
+    r.train(training_data, iterations=10000)
 
     verbose = False
     if verbose:
@@ -80,5 +85,5 @@ if __name__ == '__main__':
         for idx in range(r.w[0].shape[0]):
             print('{:<15}: {}'.format(titles[idx], r.w[0][idx]))
 
-    predict_user([0, 0, 0, 1, 1, 0], verbose)
-    predict_user([1, 0, 0, 0, 0, 0], verbose)
+    predict_user(titles, [0, 0, 0, 1, 1, 0], verbose)
+    predict_user(titles, [1, 0, 0, 0, 0, 0], verbose)

@@ -27,29 +27,27 @@ class BackPropNN(object):
         # number of input nodes
         # +1 for bias node
         self.ni = ni + 1
-        # number of output nodes
-        self.no = no
         # learning rate
         self.lr = lr
         # momentum
         self.m = m
+        # number of output nodes
+        self.no = no
 
         # hidden layer node counts
         self.h = h
         # total number of hidden layers
-        self.nhl = len(h)
+        self.nhl = len(self.h)
 
         # ----------------------------------------
         # create weights
         # ----------------------------------------
 
         self.w = []
+        self.w.append(0.1 * np.random.randn(self.ni, self.h[0]))
         # for hidden layer(s)
-        for i in range(self.nhl):
-            if i == 0:
-                self.w.append(0.1 * np.random.randn(self.ni, self.h[i]))
-            else:
-                self.w.append(0.1 * np.random.randn(self.h[i-1], self.h[i]))
+        for i in range(1, self.nhl):
+            self.w.append(0.1 * np.random.randn(self.h[i-1], self.h[i]))
         # for output layer
         self.w.append(0.1 * np.random.randn(self.h[self.nhl-1], self.no))
 
@@ -58,12 +56,10 @@ class BackPropNN(object):
         # ----------------------------------------
 
         self.c = []
+        self.c.append(np.zeros(shape=(self.ni, self.h[0])))
         # for hidden layer(s)
-        for i in range(self.nhl):
-            if i == 0:
-                self.c.append(np.zeros(shape=(self.ni, self.h[i])))
-            else:
-                self.c.append(np.zeros(shape=(self.h[i-1], self.h[i])))
+        for i in range(1, self.nhl):
+            self.c.append(np.zeros(shape=(self.h[i-1], self.h[i])))
         # for output layer
         self.c.append(np.zeros(shape=(self.h[self.nhl-1], self.no)))
 

@@ -8,13 +8,25 @@ import numpy as np
 import activation_functions as af
 
 
+np.random.seed(1)
+
+
 # noinspection PyDocstring
 class RBM(object):
 
-    def __init__(self, ni, num_hidden, lr=0.1):
-        self.num_hidden = num_hidden
+    def __init__(self, ni, nh, lr=0.1, m=0.1):
+        # number of input nodes
+        # +1 for bias node
         self.ni = ni + 1
+        # learning rate
         self.lr = lr
+        # momentum
+        self.m = m
+
+        # hidden layer node counts
+        self.h = [nh]
+        # total number of hidden layers
+        self.nhl = len(self.h)
 
         # initialize a weight matrix, of dimensions (ni x num_hidden), using a
         # Gaussian distribution with mean 0 and standard deviation 0.1
@@ -24,7 +36,7 @@ class RBM(object):
         # ----------------------------------------
 
         self.w = []
-        self.w.append(0.1 * np.random.randn(self.ni, self.num_hidden))
+        self.w.append(0.1 * np.random.randn(self.ni, self.h[0]))
 
         # insert weights for the bias units into the first row and first column
         # self.weights = np.insert(self.weights, 0, 0, axis=1)
@@ -85,7 +97,7 @@ class RBM(object):
             pos_hidden_probs, pos_associations = forward(data)
 
             pos_hidden_states = pos_hidden_probs > np.random.rand(
-                data.shape[0], self.num_hidden
+                data.shape[0], self.h[0]
             )
 
             # ----------------------------------------
@@ -145,7 +157,7 @@ class RBM(object):
          activated from the visible
         units in the data matrix passed in.
         """
-        return self._run(data, self.w[0], self.num_hidden)
+        return self._run(data, self.w[0], self.h[0])
 
     def run_hidden(self, data):
         """
@@ -221,7 +233,7 @@ class RBM(object):
             # Calculate the probabilities of turning the hidden units on.
             hidden_probs = af.func(hidden_activations)
             # Turn the hidden units on with their specified probabilities.
-            hidden_states = hidden_probs > np.random.rand(self.num_hidden + 1)
+            hidden_states = hidden_probs > np.random.rand(self.h[0] + 1)
             # Always fix the bias unit to 1.
             hidden_states[0] = 1
 
