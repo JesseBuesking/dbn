@@ -50,7 +50,7 @@ class RBM(object):
         #  [ 0.          0.14754101  0.09360807]
         #  [ 0.         -0.05690645  0.04741315]]
 
-    def train(self, data, iterations=1000):
+    def train(self, data, iterations=1000, batch_size=10):
         """
         Train the machine.
 
@@ -83,61 +83,72 @@ class RBM(object):
 
         for i in range(iterations):
 
-            # ----------------------------------------
-            # FORWARD: positive CD / reality phase
-            # ----------------------------------------
+            nvp = None
+            c = 0
+            while c < data.shape[0]:
+                d = data[c:c+batch_size]
+                c += batch_size
 
-            # clamp to the data and sample from the hidden units
-            #
-            # note that we're using the activation *probabilities* of the hidden
-            # states, not the hidden states themselves, when computing
-            # associations. we could also use the states; see section 3 of
-            # Hinton's "A Practical Guide to Training Restricted Boltzmann
-            # Machines" for more
-            pos_hidden_probs, pos_associations = forward(data)
+                # ----------------------------------------
+                # FORWARD: positive CD / reality phase
+                # ----------------------------------------
 
-            pos_hidden_states = pos_hidden_probs > np.random.rand(
-                data.shape[0], self.h[0]
-            )
+                # clamp to the data and sample from the hidden units
+                #
+                # note that we're using the activation *probabilities* of the
+                # hidden states, not the hidden states themselves, when
+                # computing associations. we could also use the states; see
+                # section 3 of Hinton's "A Practical Guide to Training
+                # Restricted Boltzmann Machines" for more
+                pos_hidden_probs, pos_associations = forward(d)
 
-            # ----------------------------------------
-            # BACK: negative CD / daydreaming phase
-            # ----------------------------------------
+                pos_hidden_states = pos_hidden_probs > np.random.rand(
+                    d.shape[0], self.h[0]
+                )
 
-            # reconstruct the visible units and sample again from the hidden
-            # units
-            neg_visible_probs, _ = back(pos_hidden_states)
+                # ----------------------------------------
+                # BACK: negative CD / daydreaming phase
+                # ----------------------------------------
 
-            # ----------------------------------------
-            # FORWARD AGAIN
-            # ----------------------------------------
+                # reconstruct the visible units and sample again from the hidden
+                # units
+                neg_visible_probs, _ = back(pos_hidden_states)
 
-            # note, again, that we're using the activation *probabilities* when
-            # computing associations, not the states themselves
-            _, neg_associations = forward(neg_visible_probs)
+                # ----------------------------------------
+                # FORWARD AGAIN
+                # ----------------------------------------
 
-            # ----------------------------------------
-            # LEARN
-            # ----------------------------------------
+                # note, again, that we're using the activation *probabilities*
+                # when computing associations, not the states themselves
+                _, neg_associations = forward(neg_visible_probs)
 
-            updates = self.lr * (
-                (pos_associations - neg_associations) / data.shape[0]
-            )
-            updates = self.lr * updates
+                # ----------------------------------------
+                # LEARN
+                # ----------------------------------------
 
-            # ----------------------------------------
-            # IMPROVE MODEL
-            # ----------------------------------------
+                updates = self.lr * (
+                    (pos_associations - neg_associations) / d.shape[0]
+                )
+                updates = self.lr * updates
 
-            # update weights
-            self.w[0] += updates
+                # ----------------------------------------
+                # IMPROVE MODEL
+                # ----------------------------------------
+
+                # update weights
+                self.w[0] += updates
+
+                if nvp is None:
+                    nvp = neg_visible_probs
+                else:
+                    nvp = np.concatenate((nvp, neg_visible_probs), axis=0)
 
             # ----------------------------------------
             # STATUS
             # ----------------------------------------
 
             if i % status_iter == 0:
-                error = np.sum((data - neg_visible_probs) ** 2)
+                error = np.sum((data - nvp) ** 2)
                 print('{:05d}: error {:.08f}'.format(i, error))
 
     def run_visible(self, data):

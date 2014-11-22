@@ -77,7 +77,7 @@ if __name__ == '__main__':
         lr=0.1
     )
 
-    r.train(training_data, iterations=10000)
+    r.train(training_data, iterations=10000, batch_size=10)
 
     verbose = False
     if verbose:
