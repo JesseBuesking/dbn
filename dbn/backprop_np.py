@@ -65,7 +65,7 @@ class NN(object):
 
         # input activations
         ai = np.array(inputs)
-        ai = np.insert(ai, ai.shape[0], 1)
+        ai = np.insert(ai, 0, 1)
 
         # hidden + output activations
         s = np.dot(ai, self.w[0])
@@ -82,7 +82,7 @@ class NN(object):
 
         # input activations
         ai = np.array(inputs)
-        ai = np.insert(ai, ai.shape[0], 1)
+        ai = np.insert(ai, 0, 1)
 
         deltas = []
         # calculate error terms for output
