@@ -22,13 +22,13 @@ def predict_user(values, verbose=False):
     print('recommendations:')
     for i in range(rex.shape[1]):
         if rex.T[i] == 1:
-            print('  {}'.format(titles[i + 1]))
+            print('  {}'.format(titles[i+1]))
 
     if verbose:
         print(predictions)
 
     # drop bias column
-    weights = r.weights[:, 1:]
+    weights = r.w[0][:, 1:]
     scores = np.dot(weights, predictions.T)
     # drop bias row
     scores = scores[1:]
@@ -72,13 +72,13 @@ if __name__ == '__main__':
         'Glitter'
     ]
 
-    r.train(training_data, iterations=50000)
+    r.train(training_data, iterations=5000)
 
     verbose = False
     if verbose:
         print('')
-        for idx in range(r.weights.shape[0]):
-            print('{:<15}: {}'.format(titles[idx], r.weights[idx]))
+        for idx in range(r.w[0].shape[0]):
+            print('{:<15}: {}'.format(titles[idx], r.w[0][idx]))
 
     predict_user([0, 0, 0, 1, 1, 0], verbose)
     predict_user([1, 0, 0, 0, 0, 0], verbose)

@@ -13,16 +13,21 @@ class RBM(object):
 
     def __init__(self, ni, num_hidden, lr=0.1):
         self.num_hidden = num_hidden
-        self.ni = ni
+        self.ni = ni + 1
         self.lr = lr
 
         # initialize a weight matrix, of dimensions (ni x num_hidden), using a
         # Gaussian distribution with mean 0 and standard deviation 0.1
-        self.weights = 0.1 * np.random.randn(self.ni, self.num_hidden)
+
+        # ----------------------------------------
+        # create weights
+        # ----------------------------------------
+
+        self.w = []
+        self.w.append(0.1 * np.random.randn(self.ni, self.num_hidden))
 
         # insert weights for the bias units into the first row and first column
-        self.weights = np.insert(self.weights, 0, 0, axis=0)
-        self.weights = np.insert(self.weights, 0, 0, axis=1)
+        # self.weights = np.insert(self.weights, 0, 0, axis=1)
 
         # example of what self.weights could be
         # [[ 0.          0.          0.        ]
@@ -49,13 +54,13 @@ class RBM(object):
         data = np.insert(data, 0, 1, axis=1)
 
         def forward(d):
-            activations = np.dot(d, self.weights)
+            activations = np.dot(d, self.w[0])
             probs = af.func(activations)
             associations = np.dot(d.T, probs)
             return probs, associations
 
         def back(s):
-            activations = np.dot(s, self.weights.T)
+            activations = np.dot(s, self.w[0].T)
             probs = af.func(activations)
             # Fix the bias unit.
             probs[:, 0] = 1
@@ -80,7 +85,7 @@ class RBM(object):
             pos_hidden_probs, pos_associations = forward(data)
 
             pos_hidden_states = pos_hidden_probs > np.random.rand(
-                data.shape[0], self.num_hidden + 1
+                data.shape[0], self.num_hidden
             )
 
             # ----------------------------------------
@@ -113,7 +118,7 @@ class RBM(object):
             # ----------------------------------------
 
             # update weights
-            self.weights += updates
+            self.w[0] += updates
 
             # ----------------------------------------
             # STATUS
@@ -140,7 +145,7 @@ class RBM(object):
          activated from the visible
         units in the data matrix passed in.
         """
-        return self._run(data, self.weights, self.num_hidden)
+        return self._run(data, self.w[0], self.num_hidden)
 
     def run_hidden(self, data):
         """
@@ -158,12 +163,12 @@ class RBM(object):
         visible_states: A matrix where each row consists of the visible units
         activated from the hidden units in the data matrix passed in.
         """
-        return self._run(data, self.weights.T, self.ni)
+        return self._run(data, self.w[0].T, self.ni)
 
     def _run(self, data, matrix, num):
         # create a matrix, where each row is to be the hidden units (plus a bias
         # unit) sampled from a training example
-        states = np.ones((data.shape[0], num + 1))
+        states = np.ones((data.shape[0], num))
 
         # insert bias units of 1 into the first column of data
         data = np.insert(data, 0, 1, axis=1)
@@ -173,7 +178,7 @@ class RBM(object):
         # calculate the probabilities of turning the hidden units on
         probs = af.func(activations)
         # turn the hidden units on with their specified probabilities
-        states[:, :] = probs > np.random.rand(data.shape[0], num + 1)
+        states[:, :] = probs > np.random.rand(data.shape[0], num)
 
         # always fix the bias unit to 1
         # states[:, 0] = 1
@@ -212,7 +217,7 @@ class RBM(object):
             visible = samples[i-1, :]
 
             # Calculate the activations of the hidden units.
-            hidden_activations = np.dot(visible, self.weights)
+            hidden_activations = np.dot(visible, self.w[0])
             # Calculate the probabilities of turning the hidden units on.
             hidden_probs = af.func(hidden_activations)
             # Turn the hidden units on with their specified probabilities.
@@ -221,7 +226,7 @@ class RBM(object):
             hidden_states[0] = 1
 
             # Recalculate the probabilities that the visible units are on.
-            visible_activations = np.dot(hidden_states, self.weights.T)
+            visible_activations = np.dot(hidden_states, self.w[0].T)
             visible_probs = af.func(visible_activations)
             visible_states = visible_probs > np.random.rand(
                 self.ni + 1
