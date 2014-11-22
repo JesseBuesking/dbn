@@ -1,11 +1,10 @@
 
 
 import numpy as np
-# from dbn.dbn import DBN
-from dbn.jrbm import JRBM
-# from dbn.rbm import test_rbm
+from dbn.rbm import RBM
 
 
+# noinspection PyDocstring
 def predict_user(values, verbose=False):
     user = np.array([values])
     print('')
@@ -47,22 +46,12 @@ def predict_user(values, verbose=False):
     for i in res:
         print('{:<15}: {}'.format(i[1], i[0]))
 
-        # test_rbm()
-        # print('building the model')
-        # numpy_rng = numpy.random.RandomState(123)
-        # dbn = DBN(
-        #     numpy_rng=numpy_rng,
-        #     n_ins=28*28,
-        #     hidden_layer_sizes=[1000,1000,1000],
-        #     n_outs=10
-        # )
-
 
 if __name__ == '__main__':
-    r = JRBM(
-        num_visible=6,
+    r = RBM(
+        ni=6,
         num_hidden=2,
-        learning_rate=0.1
+        lr=0.1
     )
     training_data = [
         [1, 1, 1, 0, 0, 0],
@@ -83,7 +72,7 @@ if __name__ == '__main__':
         'Glitter'
     ]
 
-    r.train(training_data, max_epochs=5000)
+    r.train(training_data, iterations=50000)
 
     verbose = False
     if verbose:
@@ -92,5 +81,4 @@ if __name__ == '__main__':
             print('{:<15}: {}'.format(titles[idx], r.weights[idx]))
 
     predict_user([0, 0, 0, 1, 1, 0], verbose)
-
-    predict_user([1, 0, 0, 0, 0, 0])
+    predict_user([1, 0, 0, 0, 0, 0], verbose)
