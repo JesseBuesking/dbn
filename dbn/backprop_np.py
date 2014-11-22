@@ -123,8 +123,9 @@ class NN(object):
     def test(self, patterns):
         error = 0.0
         bin_correct = 0
-        for p in patterns:
-            u = self.update(p[0])
+        for inp, tar in patterns:
+            # tar = inp
+            u = self.update(inp)
             u_bin = []
             for i in u:
                 if i < 0.5:
@@ -132,15 +133,15 @@ class NN(object):
                 else:
                     u_bin.append(1)
             # noinspection PyUnresolvedReferences
-            error += ((np.array(p[1])-np.array(u))**2).sum()
+            error += ((np.array(tar)-np.array(u))**2).sum()
             # noinspection PyTypeChecker
-            z = u_bin == p[1]
+            z = u_bin == tar
             if isinstance(z, bool):
-                bin_correct += u_bin == p[1]
+                bin_correct += u_bin == tar
             else:
                 # noinspection PyTypeChecker
-                bin_correct += all(u_bin == p[1])
-            print(p[0], '-> {} was {}'.format(p[1], u))
+                bin_correct += all(u_bin == tar)
+            print('{} -> {} was {}'.format(inp, tar, u))
 
         print('')
         print('correct: {}/{}'.format(bin_correct, len(patterns)))
@@ -153,11 +154,10 @@ class NN(object):
 
         for i in range(iterations):
             error = 0.0
-            for p in patterns:
-                inputs = p[0]
-                targets = p[1]
-                self.update(inputs)
-                error = (error + self.backPropagate(inputs, targets, N, M))
+            for inp, tar in patterns:
+                # tar = inp
+                self.update(inp)
+                error = (error + self.backPropagate(inp, tar, N, M))
             if i % print_iter == 0:
                 print('error %-.8f' % error)
 
@@ -178,6 +178,7 @@ def run_iris():
     train, test = pat[:l], pat[l:]
 
     n = NN(4, binzer.classes_.shape[0], [3, 3])
+    # n = NN(4, 4, [3])
 
     print('amt: {}'.format(iris.data.shape[0]))
 
