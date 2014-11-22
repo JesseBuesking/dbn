@@ -226,14 +226,10 @@ def run_iris():
     train, test = pat[:l], pat[l:]
 
     n = BackPropNN(4, binzer.classes_.shape[0], [3, 3], lr=0.001)
-    # n = NN(4, 4, [3])
 
     print('input rows: {}'.format(iris.data.shape[0]))
     print('')
 
-    # create a network with two input, two hidden, and one output nodes
-    # n = NN(2, 1, [2, 2])
-    # train it with some patterns
     start = time.clock()
     n.train(train, iterations=1000)
 
