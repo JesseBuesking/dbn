@@ -1,14 +1,9 @@
-"""
-Restricted Boltzmann Machine
-"""
+""" Restricted Boltzmann Machine """
 
 
 from __future__ import print_function
 import numpy as np
 import activation_functions as af
-
-
-np.random.seed(1)
 
 
 # noinspection PyDocstring
