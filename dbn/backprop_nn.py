@@ -170,8 +170,6 @@ class BackPropNN(object):
 
         print('')
         for values, targets in patterns:
-            # uncomment for auto-encoder
-            # targets = values
             a = self.predict(values)
 
             # sum of squares error
@@ -199,8 +197,6 @@ class BackPropNN(object):
         for i in range(iterations):
             error = 0.0
             for values, targets in data:
-                # uncomment for auto-encoder
-                # targets = values
                 a = self.get_activations(values)
                 error += self.back_propagate(values, targets, a)
 
