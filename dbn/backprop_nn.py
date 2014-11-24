@@ -15,7 +15,7 @@ import activation_functions as af
 # noinspection PyDocstring
 class BackPropNN(object):
 
-    def __init__(self, ni, no, h, lr=0.1, m=0.1):
+    def __init__(self, ni, no, h, iterations, lr=0.1, m=0.1):
         # number of input nodes
         # +1 for bias node
         self.ni = ni + 1
@@ -26,8 +26,12 @@ class BackPropNN(object):
         # number of output nodes
         self.no = no
 
+        # training iterations
+        self.iterations = iterations
+
         # hidden layer node counts
-        self.h = h
+        # +1 for bias terms
+        self.h = [i+1 for i in h]
         # total number of hidden layers
         self.nhl = len(self.h)
 
@@ -39,6 +43,7 @@ class BackPropNN(object):
         self.w.append(0.1 * np.random.randn(self.ni, self.h[0]))
         # for hidden layer(s)
         for i in range(1, self.nhl):
+            # +1 for bias column
             self.w.append(0.1 * np.random.randn(self.h[i-1], self.h[i]))
         # for output layer
         self.w.append(0.1 * np.random.randn(self.h[self.nhl-1], self.no))
@@ -72,10 +77,12 @@ class BackPropNN(object):
 
         a = []
         for i in range(self.nhl):
-            a.append(np.ones(self.h[i]))
+            # +1 for bias
+            a.append(np.ones(self.h[i] + 1))
 
         # for output layer
-        a.append(np.ones(self.no))
+        # +1 for bias
+        a.append(np.ones(self.no + 1))
 
         # ----------------------------------------
         # calculate activations
@@ -190,11 +197,11 @@ class BackPropNN(object):
         np.set_printoptions(precision=precision, suppress=False)
         return bin_correct, len(patterns), error
 
-    def train(self, data, iterations=1000):
+    def train(self, data):
 
-        status_iter = iterations / 10
+        status_iter = self.iterations / 10
 
-        for i in range(iterations):
+        for i in range(self.iterations):
             error = 0.0
             for values, targets in data:
                 a = self.get_activations(values)

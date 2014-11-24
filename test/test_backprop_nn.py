@@ -29,13 +29,14 @@ class BackPropNNTests(unittest.TestCase):
         l = int((len(pat)*.8))
         train, test = pat[:l], pat[l:]
 
-        n = BackPropNN(4, binzer.classes_.shape[0], [3, 3], lr=0.001)
+        it = 1000
+        n = BackPropNN(4, binzer.classes_.shape[0], [3, 3], it, lr=0.001)
 
         print('input rows: {}'.format(iris.data.shape[0]))
         print('')
 
         start = time.clock()
-        n.train(train, iterations=1000)
+        n.train(train)
 
         print('')
         print('elapsed: {}'.format(time.clock() - start))
@@ -47,8 +48,8 @@ class BackPropNNTests(unittest.TestCase):
             correct / float(total) >= .9,
             'expected min accuracy of .9, got {:.2f}%'.format(percent_correct)
         )
-        self.assertEqual(1.5186660231263243, error)
-        self.assertEqual(28, correct)
+        self.assertEqual(1.1562190348821386, error)
+        self.assertEqual(29, correct)
 
     def test_xor(self):
         """ Teach network XOR function. """
@@ -63,13 +64,14 @@ class BackPropNNTests(unittest.TestCase):
         train = pat
         test = pat
 
-        n = BackPropNN(2, 1, [2], lr=0.001)
+        it = 1000
+        n = BackPropNN(2, 1, [2], it, lr=0.001)
 
         print('input rows: {}'.format(len(pat)))
         print('')
 
         start = time.clock()
-        n.train(train, iterations=1000)
+        n.train(train)
 
         print('')
         print('elapsed: {}'.format(time.clock() - start))
@@ -83,5 +85,5 @@ class BackPropNNTests(unittest.TestCase):
             'expected a perfect score, got {:.2f}%'.format(percent_correct)
         )
 
-        self.assertEqual(0.0099941253524785407, error)
+        self.assertEqual(0.0029727590967565947, error)
         self.assertEqual(4, correct)

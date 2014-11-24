@@ -25,18 +25,19 @@ class AutoEncoderTests(unittest.TestCase):
         l = int((len(pat)*.8))
         train, test = pat[:l], pat[l:]
 
-        n = BackPropAutoEncoder(4, [3], lr=0.001)
+        it = 1000
+        n = BackPropAutoEncoder(4, [3], it, lr=0.001)
 
         print('input rows: {}'.format(iris.data.shape[0]))
         print('')
 
         start = time.clock()
-        n.train(train, iterations=1000)
+        n.train(train)
 
         print('')
         print('elapsed: {}'.format(time.clock() - start))
 
         # test it
         _, total, error = n.test(test)
-        self.assertEqual(0.63764781070470211, error)
+        self.assertEqual(0.42991140461790117, error)
 

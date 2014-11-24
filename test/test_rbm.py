@@ -54,11 +54,13 @@ class RMBTests(unittest.TestCase):
 
             return rex
 
-        np.random.seed(1)
+        np.random.seed(0)
 
         r = RBM(
             ni=6,
             nh=2,
+            iterations=10000,
+            batch_size=10,
             lr=0.1
         )
         training_data = [
@@ -82,10 +84,12 @@ class RMBTests(unittest.TestCase):
         r = RBM(
             ni=6,
             nh=2,
+            iterations=10000,
+            batch_size=10,
             lr=0.1
         )
 
-        r.train(training_data, iterations=10000, batch_size=10)
+        r.train(training_data)
 
         verbose = False
         if verbose:
@@ -94,14 +98,14 @@ class RMBTests(unittest.TestCase):
                 print('{:<15}: {}'.format(titles[idx], r.w[0][idx]))
 
         p = predict_user(titles, [0, 0, 0, 1, 1, 0], verbose)
-        e = np.array([0, 0, 1, 0, 0, 0], dtype=float)
+        e = np.array([0, 0, 1, 1, 0, 0], dtype=float)
         self.assertTrue(
             np.array_equal(e, p[0]),
             '{} != {}'.format(e, p[0])
         )
 
         p = predict_user(titles, [1, 0, 0, 0, 0, 0], verbose)
-        e = np.array([1, 1, 1, 0, 0, 0], dtype=float)
+        e = np.array([1, 1, 0, 0, 0, 0], dtype=float)
         self.assertTrue(
             np.array_equal(e, p[0]),
             '{} != {}'.format(e, p[0])

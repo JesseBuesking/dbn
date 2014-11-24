@@ -9,7 +9,7 @@ import activation_functions as af
 # noinspection PyDocstring
 class RBM(object):
 
-    def __init__(self, ni, nh, lr=0.1, m=0.1):
+    def __init__(self, ni, nh, iterations, batch_size=10, lr=0.1, m=0.1):
         # number of input nodes
         # +1 for bias node
         self.ni = ni + 1
@@ -18,8 +18,12 @@ class RBM(object):
         # momentum
         self.m = m
 
+        # training iterations
+        self.iterations = iterations
+        self.batch_size = batch_size
+
         # hidden layer node counts
-        self.h = [nh]
+        self.h = [nh+1]
         # total number of hidden layers
         self.nhl = len(self.h)
 
@@ -45,7 +49,7 @@ class RBM(object):
         #  [ 0.          0.14754101  0.09360807]
         #  [ 0.         -0.05690645  0.04741315]]
 
-    def train(self, data, iterations=1000, batch_size=10):
+    def train(self, data):
         """
         Train the machine.
 
@@ -74,15 +78,15 @@ class RBM(object):
             associations = np.dot(s.T, probs)
             return probs, associations
 
-        status_iter = iterations / 10
+        status_iter = self.iterations / 10
 
-        for i in range(iterations):
+        for i in range(self.iterations):
 
             nvp = None
             c = 0
             while c < data.shape[0]:
-                d = data[c:c+batch_size]
-                c += batch_size
+                d = data[c:c+self.batch_size]
+                c += self.batch_size
 
                 # ----------------------------------------
                 # FORWARD: positive CD / reality phase
@@ -145,6 +149,18 @@ class RBM(object):
             if i % status_iter == 0:
                 error = np.sum((data - nvp) ** 2)
                 print('{:05d}: error {:.08f}'.format(i, error))
+
+    def hidden_probs(self, data):
+
+        # insert bias units of 1 into the first column of data
+        data = np.insert(data, 0, 1, axis=1)
+
+        # calculate the activations of the hidden units
+        activations = np.dot(data, self.w[0])
+        # calculate the probabilities of turning the hidden units on
+        probs = af.func(activations)
+
+        return probs[:, 1:]
 
     def run_visible(self, data):
         """
